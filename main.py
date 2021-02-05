@@ -1,5 +1,6 @@
 import sys
 import os
+import argparse
 
 import requests
 from PyQt5 import uic
@@ -7,10 +8,27 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
 
 
+def get_cords():
+    try:
+        parser = argparse.ArgumentParser(description='set coordinates for program')
+        parser.add_argument('lon', nargs=1, type=float, metavar='LON')
+        parser.add_argument('lat', nargs=1, type=float, metavar='LAT')
+        args = parser.parse_args()
+        cords = tuple(map(lambda x: str(x), args.lon + args.lat))
+        return cords
+    except Exception as e:
+        print(e)
+        sys.exit(2)
+
+
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, ll):
         super().__init__()
         uic.loadUi('main.ui', self)
+        if not ll:
+            print('No coordinates to show')
+            sys.exit(2)
+        self.ll = ll
         self.setFixedSize(800, 600)
         self.getImage()
         self.initUi()
@@ -18,12 +36,10 @@ class MainWindow(QMainWindow):
     def getImage(self):
         api_server = "http://static-maps.yandex.ru/1.x/"
 
-        lon = "37.530887"
-        lat = "55.703118"
-        delta = "0.002"
+        delta = "0.02"
 
         params = {
-            "ll": ",".join([lon, lat]),
+            "ll": ",".join(self.ll),
             "spn": ",".join([delta, delta]),
             "l": "map"
         }
@@ -50,6 +66,6 @@ class MainWindow(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    mw = MainWindow()
+    mw = MainWindow(get_cords())
     mw.show()
     sys.exit(app.exec())
