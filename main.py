@@ -11,7 +11,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi('main.ui', self)
-        self.setFixedSize(800, 600)
+        self.setFixedSize(600, 450)
         self.getImage()
         self.initUi()
 
@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
     def initUi(self):
         self.pixmap = QPixmap(self.map_file)
         self.image.move(0, 0)
-        self.image.resize(800, 600)
+        self.image.resize(600, 450)
         self.image.setPixmap(self.pixmap)
 
     def closeEvent(self, event):
