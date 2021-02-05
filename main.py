@@ -9,26 +9,30 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
 
 
 def get_cords():
+    """Function returns tuple of coordinates and a delta from console args"""
     try:
         parser = argparse.ArgumentParser(description='set coordinates for program')
         parser.add_argument('lon', nargs=1, type=float, metavar='LON')
         parser.add_argument('lat', nargs=1, type=float, metavar='LAT')
+        parser.add_argument('delta', nargs=1, type=float, metavar='DELTA')
         args = parser.parse_args()
         cords = tuple(map(lambda x: str(x), args.lon + args.lat))
-        return cords
+        return cords, str(args.delta[0])
     except Exception as e:
         print(e)
         sys.exit(2)
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, ll):
+    """Main Window class"""
+    def __init__(self, *args):
         super().__init__()
         uic.loadUi('main.ui', self)
-        if not ll:
+        if not args:
             print('No coordinates to show')
             sys.exit(2)
-        self.ll = ll
+        self.ll = args[0][0]
+        self.delta = args[0][1]
         self.setFixedSize(800, 600)
         self.getImage()
         self.initUi()
@@ -36,11 +40,9 @@ class MainWindow(QMainWindow):
     def getImage(self):
         api_server = "http://static-maps.yandex.ru/1.x/"
 
-        delta = "0.02"
-
         params = {
             "ll": ",".join(self.ll),
-            "spn": ",".join([delta, delta]),
+            "spn": ",".join([self.delta, self.delta]),
             "l": "map"
         }
         response = requests.get(api_server, params=params)
