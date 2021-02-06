@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>593</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>-30</x>
-      <y>-60</y>
+      <y>-200</y>
       <width>801</width>
       <height>601</height>
      </rect>
@@ -27,39 +27,62 @@
      <string/>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton_1">
+   <widget class="QPushButton" name="search_btn">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>82</width>
-      <height>18</height>
+      <x>320</x>
+      <y>570</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Искать</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="adress_edit">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>570</y>
+      <width>321</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_plan">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>40</y>
+      <width>75</width>
+      <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>Карта</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton_2">
+   <widget class="QPushButton" name="btn_satellite">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>50</y>
-      <width>82</width>
-      <height>18</height>
+      <x>510</x>
+      <y>80</y>
+      <width>75</width>
+      <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>Спутник</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton_3">
+   <widget class="QPushButton" name="btn_hybride">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>80</y>
-      <width>82</width>
-      <height>18</height>
+      <x>510</x>
+      <y>120</y>
+      <width>75</width>
+      <height>23</height>
      </rect>
     </property>
     <property name="text">

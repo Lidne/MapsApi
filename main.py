@@ -37,33 +37,62 @@ class MainWindow(QMainWindow):
         self.ll = args[0][0]
         self.delta = args[0][1]
         self.setFixedSize(800, 600)
-        self.radioButton_1.setChecked(True)
-        self.radioButton_1.toggled.connect(self.onClicked)
-        self.radioButton_2.toggled.connect(self.onClicked)
-        self.radioButton_3.toggled.connect(self.onClicked)
+        self.btn_plan.clicked.connect(self.onClicked)
+        self.btn_satellite.clicked.connect(self.onClicked)
+        self.btn_hybride.clicked.connect(self.onClicked)
+        self.search_btn.clicked.connect(self.search)
         self.l = 'map'
+        self.search = False
         self.getImage()
         self.initUi()
+        self.mark = {}
 
     def onClicked(self):
-        if self.radioButton_1.isChecked():
+        if self.sender().text() == 'Карта':
             self.l = 'map'
-        if self.radioButton_2.isChecked():
+        if self.sender().text() == 'Спутник':
             self.l = 'sat'
-        if self.radioButton_3.isChecked():
+        if self.sender().text() == 'Гибрид':
             self.l = 'sat,skl'
         self.getImage()
         self.initUi()
 
+    def search(self):
+        object = ('+').join(self.adress_edit.text().split())
+        apikey = "40d1649f-0493-4b70-98ba-98533de7710b"
+        geocoder_request = f"http://geocode-maps.yandex.ru/1.x/?apikey={apikey}&geocode={object}&format=json"
+        response = requests.get(geocoder_request)
+        if response:
+            json_response = response.json()
+            toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+            toponym_coodrinates = toponym["Point"]["pos"]
+            self.ll = toponym_coodrinates.split()
+            self.search = True
+            self.getImage()
+            self.initUi()
+
+        else:
+            print("Ошибка выполнения запроса:")
+            print(geocoder_request)
+            print("Http статус:", response.status_code, "(", response.reason, ")")
+
     def getImage(self):
         api_server = "http://static-maps.yandex.ru/1.x/"
-        params = {
-            "ll": ",".join(self.ll),
-            "spn": ",".join([self.delta, self.delta]),
-            "l": self.l
-        }
-        response = requests.get(api_server, params=params)
+        if self.search:
+            params = {
+                "ll": ",".join(self.ll),
+                "spn": ",".join([self.delta, self.delta]),
+                "l": self.l,
+                "pt": "{0},pm2dgl".format("{0},{1}".format(self.ll[0], self.ll[1]))
+            }
+        else:
+            params = {
+                "ll": ",".join(self.ll),
+                "spn": ",".join([self.delta, self.delta]),
+                "l": self.l
+            }
 
+        response = requests.get(api_server, params=params)
         if not response:
             print("Ошибка выполнения запроса.")
             print("Http статус:", response.status_code, "(", response.reason, ")")
