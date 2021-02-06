@@ -9,6 +9,8 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
 from PyQt5 import QtGui
 
+# Переключение видов пока не работает, но это исправится в следующих версиях
+
 
 def get_cords():
     """Function returns tuple of coordinates and a delta from console args"""
