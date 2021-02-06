@@ -31,6 +31,9 @@ class MainWindow(QMainWindow):
     def __init__(self, *args):
         super().__init__()
         uic.loadUi('main.ui', self)
+        self.initUi(args)
+
+    def initUi(self, args):
         if not args:
             print('No coordinates to show')
             sys.exit(2)
@@ -41,21 +44,28 @@ class MainWindow(QMainWindow):
         self.btn_satellite.clicked.connect(self.onClicked)
         self.btn_hybride.clicked.connect(self.onClicked)
         self.search_btn.clicked.connect(self.search)
+        self.up.clicked.connect(self.change_pos)
+        self.right.clicked.connect(self.change_pos)
+        self.left.clicked.connect(self.change_pos)
+        self.down.clicked.connect(self.change_pos)
         self.l = 'map'
         self.search = False
         self.getImage()
-        self.initUi()
+        self.setImage()
         self.mark = {}
 
     def onClicked(self):
         if self.sender().text() == 'Карта':
             self.l = 'map'
+            print('map')
         if self.sender().text() == 'Спутник':
             self.l = 'sat'
+            print('sat')
         if self.sender().text() == 'Гибрид':
             self.l = 'sat,skl'
+            print('gib')
         self.getImage()
-        self.initUi()
+        self.setImage()
 
     def search(self):
         object = ('+').join(self.adress_edit.text().split())
@@ -69,12 +79,30 @@ class MainWindow(QMainWindow):
             self.ll = toponym_coodrinates.split()
             self.search = True
             self.getImage()
-            self.initUi()
+            self.setImage()
 
         else:
             print("Ошибка выполнения запроса:")
             print(geocoder_request)
             print("Http статус:", response.status_code, "(", response.reason, ")")
+
+    def change_pos(self):
+        try:
+            ll = list(map(float, self.ll))
+            k = float(self.delta) * 1.5
+            if self.sender().objectName() == 'up':
+                ll[1] += k
+            if self.sender().objectName() == 'right':
+                ll[0] += k
+            if self.sender().objectName() == 'left':
+                ll[0] -= k
+            if self.sender().objectName() == 'down':
+                ll[1] -= k
+            self.ll = list(map(str, ll))
+            self.getImage()
+            self.setImage()
+        except Exception:
+            pass
 
     def getImage(self):
         api_server = "http://static-maps.yandex.ru/1.x/"
@@ -91,8 +119,10 @@ class MainWindow(QMainWindow):
                 "spn": ",".join([self.delta, self.delta]),
                 "l": self.l
             }
+        print(params)
 
         response = requests.get(api_server, params=params)
+        print(response)
         if not response:
             print("Ошибка выполнения запроса.")
             print("Http статус:", response.status_code, "(", response.reason, ")")
@@ -102,10 +132,8 @@ class MainWindow(QMainWindow):
         with open(self.map_file, "wb") as file:
             file.write(response.content)
 
-    def initUi(self):
+    def setImage(self):
         self.pixmap = QPixmap(self.map_file)
-        self.image.move(0, 0)
-        self.image.resize(800, 600)
         self.image.setPixmap(self.pixmap)
 
     def closeEvent(self, event):
