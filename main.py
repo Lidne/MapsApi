@@ -9,6 +9,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
 from PyQt5 import QtGui
 
+
 # Переключение видов пока не работает, но это исправится в следующих версиях
 
 
@@ -82,6 +83,7 @@ class MainWindow(QMainWindow):
             self.search = True
             self.getImage()
             self.setImage()
+            self.search = False
 
         else:
             print("Ошибка выполнения запроса:")
