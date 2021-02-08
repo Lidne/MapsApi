@@ -91,18 +91,30 @@ class MainWindow(QMainWindow):
     def change_pos(self):
         try:
             ll = list(map(float, self.ll))
-            k = float(self.delta) * 1.5
+            k = round(float(self.delta) * 1.5, 4)
+            h_k = round(k * 2, 4)
             if self.sender().objectName() == 'up':
-                ll[1] += k
+                if ll[1] + k > 80:
+                    ll[1] = 80
+                else:
+                    ll[1] += k
             if self.sender().objectName() == 'right':
-                ll[0] += k
+                if ll[0] + h_k > 179:
+                    ll[0] = -179
+                else:
+                    ll[0] += h_k
             if self.sender().objectName() == 'left':
-                ll[0] -= k
+                if ll[0] - h_k < -179:
+                    ll[0] = 179
+                else:
+                    ll[0] -= h_k
             if self.sender().objectName() == 'down':
-                ll[1] -= k
+                if ll[1] - k < -80:
+                    ll[1] = -80
+                else:
+                    ll[1] -= k
             self.ll = list(map(str, ll))
             self.getImage()
-            self.setImage()
         except Exception:
             pass
 
