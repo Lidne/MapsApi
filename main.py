@@ -6,11 +6,9 @@ from PIL.ImageQt import ImageQt
 import requests
 from PyQt5 import uic
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
 from PyQt5 import QtGui
-
-
-# Переключение видов пока не работает, но это исправится в следующих версиях
 
 
 def get_cords():
@@ -54,7 +52,6 @@ class MainWindow(QMainWindow):
         self.l = 'map'
         self.search = False
         self.getImage()
-        self.setImage()
         self.mark = {}
 
     def onClicked(self):
@@ -68,7 +65,6 @@ class MainWindow(QMainWindow):
             self.l = 'sat,skl'
             print('gib')
         self.getImage()
-        self.setImage()
 
     def search(self):
         object = ('+').join(self.adress_edit.text().split())
@@ -82,7 +78,6 @@ class MainWindow(QMainWindow):
             self.ll = toponym_coodrinates.split()
             self.search = True
             self.getImage()
-            self.setImage()
             self.search = False
 
         else:
@@ -93,20 +88,53 @@ class MainWindow(QMainWindow):
     def change_pos(self):
         try:
             ll = list(map(float, self.ll))
-            k = float(self.delta) * 1.5
+            k = round(float(self.delta) * 1.5, 4)
+            h_k = round(k * 2, 4)
             if self.sender().objectName() == 'up':
-                ll[1] += k
+                if ll[1] + k > 80:
+                    ll[1] = 80
+                else:
+                    ll[1] += k
             if self.sender().objectName() == 'right':
-                ll[0] += k
+                if ll[0] + h_k > 179:
+                    ll[0] = -179
+                else:
+                    ll[0] += h_k
             if self.sender().objectName() == 'left':
-                ll[0] -= k
+                if ll[0] - h_k < -179:
+                    ll[0] = 179
+                else:
+                    ll[0] -= h_k
             if self.sender().objectName() == 'down':
-                ll[1] -= k
+                if ll[1] - k < -80:
+                    ll[1] = -80
+                else:
+                    ll[1] -= k
             self.ll = list(map(str, ll))
             self.getImage()
-            self.setImage()
         except Exception:
             pass
+
+    def keyPressEvent(self, event):
+        try:
+            delta = float(self.delta)
+            if event.key() == Qt.Key_Down:
+                print('DOWN')
+            if event.key() == Qt.Key_PageUp:
+                if delta * 2 > 90:
+                    delta = 90
+                else:
+                    delta *= 2
+            if event.key() == Qt.Key_PageDown:
+                if delta / 2 < 0.002:
+                    delta = 0.002
+                else:
+                    delta /= 2
+            self.delta = str(delta)
+            print(self.delta)
+            self.getImage()
+        except Exception as e:
+            print('Error: ', e)
 
     def getImage(self):
         api_server = "http://static-maps.yandex.ru/1.x/"
@@ -135,6 +163,7 @@ class MainWindow(QMainWindow):
         self.map_file = "map.png"
         with open(self.map_file, "wb") as file:
             file.write(response.content)
+        self.setImage()
 
     def setImage(self):
         self.pixmap = QPixmap(self.map_file)
