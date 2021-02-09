@@ -44,15 +44,8 @@ class MainWindow(QMainWindow):
         self.btn_plan.clicked.connect(self.onClicked)
         self.btn_satellite.clicked.connect(self.onClicked)
         self.btn_hybride.clicked.connect(self.onClicked)
-        self.search_btn.clicked.connect(self.search)
-        self.up.clicked.connect(self.change_pos)
-        self.right.clicked.connect(self.change_pos)
-        self.left.clicked.connect(self.change_pos)
-        self.down.clicked.connect(self.change_pos)
         self.l = 'map'
-        self.search = False
         self.getImage()
-        self.mark = {}
 
     def onClicked(self):
         if self.sender().text() == 'Карта':
@@ -66,92 +59,13 @@ class MainWindow(QMainWindow):
             print('gib')
         self.getImage()
 
-    def search(self):
-        object = ('+').join(self.adress_edit.text().split())
-        apikey = "40d1649f-0493-4b70-98ba-98533de7710b"
-        geocoder_request = f"http://geocode-maps.yandex.ru/1.x/?apikey={apikey}&geocode={object}&format=json"
-        response = requests.get(geocoder_request)
-        if response:
-            json_response = response.json()
-            toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
-            toponym_coodrinates = toponym["Point"]["pos"]
-            self.ll = toponym_coodrinates.split()
-            self.search = True
-            self.getImage()
-            self.search = False
-
-        else:
-            print("Ошибка выполнения запроса:")
-            print(geocoder_request)
-            print("Http статус:", response.status_code, "(", response.reason, ")")
-
-
-    def change_pos(self):
-        try:
-            ll = list(map(float, self.ll))
-            k = round(float(self.delta) * 1.5, 4)
-            h_k = round(k * 2, 4)
-            if self.sender().objectName() == 'up':
-                if ll[1] + k > 80:
-                    ll[1] = 80
-                else:
-                    ll[1] += k
-            if self.sender().objectName() == 'right':
-                if ll[0] + h_k > 179:
-                    ll[0] = -179
-                else:
-                    ll[0] += h_k
-            if self.sender().objectName() == 'left':
-                if ll[0] - h_k < -179:
-                    ll[0] = 179
-                else:
-                    ll[0] -= h_k
-            if self.sender().objectName() == 'down':
-                if ll[1] - k < -80:
-                    ll[1] = -80
-                else:
-                    ll[1] -= k
-            self.ll = list(map(str, ll))
-            self.getImage()
-        except Exception:
-            pass
-
-    def keyPressEvent(self, event):
-        try:
-            delta = float(self.delta)
-            if event.key() == Qt.Key_Down:
-                print('DOWN')
-            if event.key() == Qt.Key_PageUp:
-                if delta * 2 > 90:
-                    delta = 90
-                else:
-                    delta *= 2
-            if event.key() == Qt.Key_PageDown:
-                if delta / 2 < 0.002:
-                    delta = 0.002
-                else:
-                    delta /= 2
-            self.delta = str(delta)
-            print(self.delta)
-            self.getImage()
-        except Exception as e:
-            print('Error: ', e)
-
     def getImage(self):
         api_server = "http://static-maps.yandex.ru/1.x/"
-        if self.search:
-            params = {
-                "ll": ",".join(self.ll),
-                "spn": ",".join([self.delta, self.delta]),
-                "l": self.l,
-                "pt": "{0},pm2dgl".format("{0},{1}".format(self.ll[0], self.ll[1]))
-            }
-        else:
-            params = {
-                "ll": ",".join(self.ll),
-                "spn": ",".join([self.delta, self.delta]),
-                "l": self.l
-            }
+        params = {
+            "ll": ",".join(self.ll),
+            "spn": ",".join([self.delta, self.delta]),
+            "l": self.l,
+        }
         print(params)
 
         response = requests.get(api_server, params=params)
