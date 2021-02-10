@@ -7,8 +7,10 @@ import requests
 from PyQt5 import uic
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
+from PyQt5.QtWidgets import QApplication, QMainWindow, QInputDialog
 from PyQt5 import QtGui
+
+# Переключение видов пока не работает, но это исправится в следующих версиях
 
 
 def get_cords():
@@ -45,10 +47,6 @@ class MainWindow(QMainWindow):
         self.btn_satellite.clicked.connect(self.onClicked)
         self.btn_hybride.clicked.connect(self.onClicked)
         self.search_btn.clicked.connect(self.search)
-        self.up.clicked.connect(self.change_pos)
-        self.right.clicked.connect(self.change_pos)
-        self.left.clicked.connect(self.change_pos)
-        self.down.clicked.connect(self.change_pos)
         self.l = 'map'
         self.search = False
         self.getImage()
@@ -67,59 +65,30 @@ class MainWindow(QMainWindow):
         self.getImage()
 
     def search(self):
-        object = ('+').join(self.adress_edit.text().split())
-        apikey = "40d1649f-0493-4b70-98ba-98533de7710b"
-        geocoder_request = f"http://geocode-maps.yandex.ru/1.x/?apikey={apikey}&geocode={object}&format=json"
-        response = requests.get(geocoder_request)
-        if response:
-            json_response = response.json()
-            toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
-            toponym_coodrinates = toponym["Point"]["pos"]
-            self.ll = toponym_coodrinates.split()
-            self.search = True
-            self.getImage()
-            self.search = False
+        text_toponym, ok_pressed = QInputDialog.getText(self, 'Введите объект поиска', 'Что найти на карте?')
 
-        else:
-            print("Ошибка выполнения запроса:")
-            print(geocoder_request)
-            print("Http статус:", response.status_code, "(", response.reason, ")")
-
-    def change_pos(self):
-        try:
-            ll = list(map(float, self.ll))
-            k = round(float(self.delta) * 1.5, 4)
-            h_k = round(k * 2, 4)
-            if self.sender().objectName() == 'up':
-                if ll[1] + k > 80:
-                    ll[1] = 80
-                else:
-                    ll[1] += k
-            if self.sender().objectName() == 'right':
-                if ll[0] + h_k > 179:
-                    ll[0] = -179
-                else:
-                    ll[0] += h_k
-            if self.sender().objectName() == 'left':
-                if ll[0] - h_k < -179:
-                    ll[0] = 179
-                else:
-                    ll[0] -= h_k
-            if self.sender().objectName() == 'down':
-                if ll[1] - k < -80:
-                    ll[1] = -80
-                else:
-                    ll[1] -= k
-            self.ll = list(map(str, ll))
-            self.getImage()
-        except Exception:
-            pass
+        if ok_pressed:
+            object = ('+').join(text_toponym.split())
+            apikey = "40d1649f-0493-4b70-98ba-98533de7710b"
+            geocoder_request = f"http://geocode-maps.yandex.ru/1.x/?apikey={apikey}&geocode={object}&format=json"
+            response = requests.get(geocoder_request)
+            if response:
+                json_response = response.json()
+                toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+                toponym_coodrinates = toponym["Point"]["pos"]
+                self.ll = toponym_coodrinates.split()
+                self.search = True
+                self.getImage()
+                self.search = False
+                self.toponym_l.setText(text_toponym)
+            else:
+                print("Ошибка выполнения запроса:")
+                print(geocoder_request)
+                print("Http статус:", response.status_code, "(", response.reason, ")")
 
     def keyPressEvent(self, event):
         try:
             delta = float(self.delta)
-            if event.key() == Qt.Key_Down:
-                print('DOWN')
             if event.key() == Qt.Key_PageUp:
                 if delta * 2 > 90:
                     delta = 90
@@ -132,6 +101,32 @@ class MainWindow(QMainWindow):
                     delta /= 2
             self.delta = str(delta)
             print(self.delta)
+
+            ll = list(map(float, self.ll))
+            k = round(float(self.delta) * 1.4, 5)
+            h_k = round(k * 1.7, 5)
+            if event.key() == Qt.Key_Up:
+                if ll[1] + k > 80:
+                    ll[1] = 80
+                else:
+                    ll[1] += k
+            if event.key() == Qt.Key_Right:
+                if ll[0] + h_k > 179:
+                    ll[0] = -179
+                else:
+                    ll[0] += h_k
+            if event.key() == Qt.Key_Left:
+                if ll[0] - h_k < -179:
+                    ll[0] = 179
+                else:
+                    ll[0] -= h_k
+            if event.key() == Qt.Key_Down:
+                if ll[1] - k < -80:
+                    ll[1] = -80
+                else:
+                    ll[1] -= k
+            self.ll = list(map(str, ll))
+
             self.getImage()
         except Exception as e:
             print('Error: ', e)
@@ -163,7 +158,6 @@ class MainWindow(QMainWindow):
         self.map_file = "map.png"
         with open(self.map_file, "wb") as file:
             file.write(response.content)
-        self.setImage()
 
     def setImage(self):
         self.pixmap = QPixmap(self.map_file)
