@@ -150,6 +150,7 @@ class MainWindow(QMainWindow):
         self.map_file = "map.png"
         with open(self.map_file, "wb") as file:
             file.write(response.content)
+        self.setImage()
 
     def setImage(self):
         self.pixmap = QPixmap(self.map_file)
