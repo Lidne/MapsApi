@@ -10,8 +10,6 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QInputDialog
 from PyQt5 import QtGui
 
-# Переключение видов пока не работает, но это исправится в следующих версиях
-
 
 def get_cords():
     """Function returns tuple of coordinates and a delta from console args"""
@@ -55,13 +53,10 @@ class MainWindow(QMainWindow):
     def onClicked(self):
         if self.sender().text() == 'Карта':
             self.l = 'map'
-            print('map')
         if self.sender().text() == 'Спутник':
             self.l = 'sat'
-            print('sat')
         if self.sender().text() == 'Гибрид':
             self.l = 'sat,skl'
-            print('gib')
         self.getImage()
 
     def search(self):
@@ -100,7 +95,6 @@ class MainWindow(QMainWindow):
                 else:
                     delta /= 2
             self.delta = str(delta)
-            print(self.delta)
 
             ll = list(map(float, self.ll))
             k = round(float(self.delta) * 1.4, 5)
@@ -146,10 +140,8 @@ class MainWindow(QMainWindow):
                 "spn": ",".join([self.delta, self.delta]),
                 "l": self.l
             }
-        print(params)
 
         response = requests.get(api_server, params=params)
-        print(response)
         if not response:
             print("Ошибка выполнения запроса.")
             print("Http статус:", response.status_code, "(", response.reason, ")")
