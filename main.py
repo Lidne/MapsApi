@@ -45,6 +45,7 @@ class MainWindow(QMainWindow):
         self.btn_satellite.clicked.connect(self.onClicked)
         self.btn_hybride.clicked.connect(self.onClicked)
         self.search_btn.clicked.connect(self.search)
+        self.reset.clicked.connect(self.onClicked)
         self.l = 'map'
         self.pt_pos = []
         self.search = False
@@ -57,6 +58,9 @@ class MainWindow(QMainWindow):
             self.l = 'sat'
         if self.sender().text() == 'Гибрид':
             self.l = 'sat,skl'
+        if self.sender().text() == 'Сброс поискового результата':
+            self.pt_pos = []
+            self.toponym_l.setText('')
         self.getImage()
 
     def search(self):

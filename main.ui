@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>MapsApi</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="image">
@@ -31,9 +31,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>570</y>
-      <width>71</width>
-      <height>21</height>
+      <y>560</y>
+      <width>81</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="focusPolicy">
@@ -51,8 +51,8 @@
      <rect>
       <x>710</x>
       <y>20</y>
-      <width>75</width>
-      <height>23</height>
+      <width>81</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="tabletTracking">
@@ -69,9 +69,9 @@
     <property name="geometry">
      <rect>
       <x>710</x>
-      <y>50</y>
-      <width>75</width>
-      <height>23</height>
+      <y>60</y>
+      <width>81</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="mouseTracking">
@@ -94,9 +94,9 @@
     <property name="geometry">
      <rect>
       <x>710</x>
-      <y>80</y>
-      <width>75</width>
-      <height>23</height>
+      <y>100</y>
+      <width>81</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="mouseTracking">
@@ -121,7 +121,7 @@
    <widget class="QLabel" name="toponym_l">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>570</y>
       <width>421</width>
       <height>21</height>
@@ -129,6 +129,22 @@
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="reset">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>560</y>
+      <width>261</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="text">
+     <string>Сброс поискового результата</string>
     </property>
    </widget>
   </widget>
