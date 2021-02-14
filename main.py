@@ -46,9 +46,9 @@ class MainWindow(QMainWindow):
         self.btn_hybride.clicked.connect(self.onClicked)
         self.search_btn.clicked.connect(self.search)
         self.l = 'map'
+        self.pt_pos = []
         self.search = False
         self.getImage()
-        self.mark = {}
 
     def onClicked(self):
         if self.sender().text() == 'Карта':
@@ -72,6 +72,7 @@ class MainWindow(QMainWindow):
                 toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
                 toponym_coodrinates = toponym["Point"]["pos"]
                 self.ll = toponym_coodrinates.split()
+                self.pt_pos = self.ll[:]
                 self.search = True
                 self.getImage()
                 self.search = False
@@ -127,12 +128,12 @@ class MainWindow(QMainWindow):
 
     def getImage(self):
         api_server = "http://static-maps.yandex.ru/1.x/"
-        if self.search:
+        if self.pt_pos:
             params = {
                 "ll": ",".join(self.ll),
                 "spn": ",".join([self.delta, self.delta]),
                 "l": self.l,
-                "pt": "{0},pm2dgl".format("{0},{1}".format(self.ll[0], self.ll[1]))
+                "pt": "{0},pm2dgl".format(','.join(self.pt_pos))
             }
         else:
             params = {
